@@ -23,7 +23,7 @@
                 <template v-for="(category, index) in categories">
                     <li class="nav-item">
                         <button class="nav-link" :class="{ 'active': index === 0}" :style="category.link_style" data-coreui-toggle="pill" :data-coreui-target="`#category-${index}`" type="button" role="tab" :aria-controls="`#category-${index}`" :aria-selected="index === 0">
-                            <i :class="category.bi_icon"></i> {{ category.header }}
+                            <i :class="category.bi_icon"></i> {{ category.link_text }}
                         </button>
                     </li>
                 </template>
@@ -112,6 +112,7 @@
                     categories: [
                         {
                             header: null,
+                            link_text: null,
                             link_style: null,
                             bi_icon: null,
                             contents: [
