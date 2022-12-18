@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/@coreui/coreui@4.2.0/dist/css/coreui.min.css" rel="stylesheet" integrity="sha384-UkVD+zxJKGsZP3s/JuRzapi4dQrDDuEf/kHphzg8P3v8wuQ6m9RLjTkPGeFcglQU" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css" integrity="sha384-b6lVK+yci+bfDmaY1u0zE8YYJt0TZxLEAFyYSLHId4xoVvsrQu3INevFKo+Xir8e" crossorigin="anonymous">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="favicon/site.webmanifest">
+    <title></title>
+</head>
+<body>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@coreui/coreui@4.2.0/dist/js/coreui.bundle.min.js" integrity="sha384-n0qOYeB4ohUPebL1M9qb/hfYkTp4lvnZM6U6phkRofqsMzK29IdkBJPegsyfj/r4" crossorigin="anonymous"></script>
+
+    <div id="app" class="d-flex">
+        <div class="sidebar sidebar-lg sidebar-fixed sidebar-self-hiding-md docs-sidebar elevation-0" :style="`background: ${sidebar_bg}`" id="sidebar">
+            <img class="img-fluid mb-4" :src="navbar_img">
+            <ul class="nav flex-column nav-pills nav-tabs mx-1 px-xl-2" role="tablist" id="tabs">
+                <template v-for="(category, index) in categories">
+                    <li class="nav-item">
+                        <button class="nav-link" :class="{ 'active': index === 0}" data-coreui-toggle="pill" :data-coreui-target="`#category-${index}`" type="button" role="tab" :aria-controls="`#category-${index}`" :aria-selected="index === 0">
+                            <i :class="category.bi_icon"></i> {{ category.header }}
+                        </button>
+                    </li>
+                </template>
+            </ul>
+        </div>
+        <div class="wrapper flex-grow-1">
+            <header class="header header-sticky mb-5 elevation-0 border-bottom d-lg-none">
+                <button class="header-toggler m-1" type="button" aria-controls="bdNavbar" aria-expanded="false" aria-label="Toggle navigation" onclick="coreui.Sidebar.getInstance(document.querySelector('#sidebar')).toggle()">
+                    <i class="bi bi-list"></i>
+                </button>
+            </header>
+            <div class="container-lg my-md-4 flex-grow-1">
+                <main class="docs-main order-1">
+                    <div class="docs-intro ps-lg-4">
+                        <div class="p-5 mb-4 bg-light rounded-3">
+                            <div class="container-fluid py-5">
+                                <h1 class="display-3 fw-bold text-center">
+                                    {{ site_header }}
+                                </h1>
+                            </div>
+                        </div>
+                        <div class="tab-content" id="content-tabContent">
+                            <template v-for="(category, index) in categories">
+                                <div class="tab-pane fade" :class="{'show': index === 0, 'active': index === 0}" :id="`category-${index}`" role="tabpanel" tabindex="0">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5 class="card-title display-6 fw-bold">
+                                                {{ category.header }}
+                                            </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div>
+                                                <div class="text-center">
+                                                    <template v-for="content in category.contents">
+                                                        <template v-if="content.type === 'img'">
+                                                            <img class="img-fluid" :class="content.class" :style="content.style" :src="content.data">
+                                                        </template>
+                                                        <template v-if="content.type === 'paragraph'">
+                                                            <p :class="content.class" :style="content.style">
+                                                                {{ content.data }}
+                                                            </p>
+                                                        </template>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <template v-if="categories.length > 1">
+                                            <div class="card-footer">
+                                                <template v-if="index !== 0">
+                                                    <button type="button" class="btn btn-secondary" style="float: left;" @click.native="openTab(index - 1)">
+                                                        <i class="bi bi-arrow-left"></i> Previous
+                                                    </button>
+                                                </template>
+                                                <template v-if="index !== category.length - 1">
+                                                    <button type="button" class="btn btn-primary" style="float: right;" @click.native="openTab(index + 1)">
+                                                        Next <i class="bi bi-arrow-right"></i>
+                                                    </button>
+                                                </template>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const { createApp } = Vue;
+        
+        createApp({
+            data() {
+                return {
+                    site_title: null,
+                    site_header: null,
+                    navbar_img: null,
+                    body_bg: null,
+                    sidebar_bg: null,
+                    categories: [
+                        {
+                            header: null,
+                            bi_icon: null,
+                            contents: [
+                                {
+                                    type: null,
+                                    data: null,
+                                    style: null,
+                                    class: null,
+                                },
+                            ],
+                        },
+                    ],
+                };
+            },
+            watch: {
+                body_bg(newVal) {
+                    document.body.style.background = newVal;
+                },
+                site_title(newVal) {
+                    document.title = newVal;
+                },
+            },
+            methods: {
+                setupCuiTabs() {
+                    const triggerTabList = document.querySelectorAll('#tabs button');
+                    triggerTabList.forEach(triggerEl => {
+                        const tabTrigger = new coreui.Tab(triggerEl)
+                        triggerEl.addEventListener('click', event => {
+                            event.preventDefault()
+                            tabTrigger.show()
+                        });
+                    });
+                },
+                openTab(value) {
+                    const target = `#category-${value}`;
+                    const triggerEl = document.querySelector(`#tabs button[data-coreui-target="${target}"]`);
+                    coreui.Tab.getInstance(triggerEl).show()
+                    window.scrollTo(0, 0)
+                },
+            },
+            async created() {
+                let response = await fetch('https://api.jsonbin.io/v3/qs/639e96b3dfc68e59d56b0d3a');
+                let data = await response.json();
+                Object.keys(data.record).forEach((key) => {
+                    this[key] = data.record[key];
+                });
+            },
+            updated() {
+                this.setupCuiTabs();
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
